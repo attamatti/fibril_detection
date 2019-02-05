@@ -1,7 +1,7 @@
 # fibril_detection
 Find raw micrographs that contain amyloid fibrils
 
-Run with ./find_fibrils.py <mrc files>
+Run with ./find_fibrils.py &lt;mrc files&gt;
 
 Takes a samples of the power spectrum between 40-90 px radiating out for the center, 
 averages and looks for peaks corresponding to merdianol layer lines from fibular structures.
