@@ -12,10 +12,10 @@ from numpy import *
 import math
 import os
 
-
+vers=0.3
 
 outdir = 'output'
-cutoff = 1.5
+cutoff = 1.4
 
 
 
@@ -86,11 +86,6 @@ def get_PS(image_in,outname):
     # Calculate 2D power spectrum
     ps2D = np.abs( F2 )**2
     
-    #theimage = plt.imshow(np.log10(ps2D),cmap='Greys_r')
-    #theimage.axes.get_xaxis().set_visible(False)
-    #theimage.axes.get_yaxis().set_visible(False)
-    #plt.savefig(outname)
-    #plt.close()
     return (ps2D)
 
 
@@ -104,8 +99,6 @@ def get_data(file):
     filename = file.split('.')[0]
     the_PS = get_PS(file,'{0}_fullPS.png'.format(filename))
     cx,cy = (int(the_PS.shape[0]/2)+1,int(the_PS.shape[1]/2)+1)
-    #middle = the_PS[cx-100:cx+101,cy-100:cy+101]
-    #return(middle)
     return(the_PS,cx,cy)
 
 
@@ -129,9 +122,9 @@ def do_radii_calcs(thedata,cx,cy):
     for angle in (angles):
         for i in radii:
             pt= get_radialpoint(angle,i)
-            #list1.append(np.log10(middle.item(cx+pt[0],cy+pt[1])))   
-            list1.append(thedata.item(cx+pt[0],cy+pt[1]))  
-            thedata[cx+pt[0],cy+pt[1]] = 1
+            list1.append(thedata.item(int(cx+pt[0]),int(cy+pt[1])))  
+            thedata[int(cx+pt[0]),int(cy+pt[1])] = thedata[int(cx+pt[0]),int(cy+pt[1])]*0.25
+        
         #for i in amyloid_radaii:                                   # code for getting 4.8A data as well
         #    pt= get_radialpoint(angle,i)                           # doesn't work very well - too much noise
         #    #list1.append(np.log10(middle.item(cx+pt[0],cy+pt[1])))   #removing this speeds it up.
@@ -143,17 +136,10 @@ def do_radii_calcs(thedata,cx,cy):
         list1= []
         amyloid_data = []
     
-    #theimage = plt.imshow(np.log10(thedata),cmap='Greys_r')       # print out the PS with the regions sampled 
-    #theimage.axes.get_xaxis().set_visible(False)                  # marked. Breaks the actual output but used for 
-    #theimage.axes.get_yaxis().set_visible(False)                  # debugging
-    #plt.savefig('{}_PS.png'.format(filename),dpi=800)
-    #plt.close()
-    
     x = np.array(allradii)
     a = np.array(allamyloid)
     
     return(x,a)
-    #return(radsy)
 
 
 def moving_average(a, n) :
@@ -170,6 +156,13 @@ for i in angles:
     angs.append(n)
     n+=0.25
 angles = angs
+
+#remove 5 degrees around 0, 90, 180, and 270 degree sampling because of edge artifacts
+del angles[1420:1441]
+del angles[1060:1101]
+del angles[700:741]
+del angles[340:381]
+del angles[0:21]
 radii = range(40,90)
 
 
@@ -196,7 +189,7 @@ for i in files:
         print('{0}% done'.format(pthresh))
         pthresh +=20
     count = []
-    filename = i.split('.')[0]
+    filename = i.split('/')[-1].split('.')[0]
     ps_chunk,cx,cy=get_data(i)
     lowres,amyloid_peak = do_radii_calcs(ps_chunk,cx,cy)
     lowres = moving_average(lowres,50)
@@ -223,5 +216,20 @@ for i in files:
     plt.legend(loc='best',fontsize='xx-small')
     plt.savefig("{2}/{1}/{0}_output.png".format(filename,outdir,cwd))
     plt.close()
+    
+    fig,ax = plt.subplots()
+    ax.imshow(np.log10(ps_chunk[cx-100:cx+100,cy-100:cy+100]),cmap='Greys')       # print out the PS with the regions sampled                
+    ax.axis('off')
+    fig.savefig("{2}/{1}/{0}_PS.png".format(filename,outdir,cwd))
+    plt.close()
+    
+    fig,ax = plt.subplots()
+    mrcim = mrc_image(i)
+    image = read(mrcim)
+    ax.imshow(image,cmap='Greys') 
+    ax.axis('off')
+    fig.savefig("{2}/{1}/{0}_img.png".format(filename,outdir,cwd))
+    plt.close()
+    
     runcount +=1
 print('--\n{0} predicted fibrils\n{1} predicted empty'.format(fibcount,emptycount))
