@@ -217,19 +217,19 @@ for i in files:
     plt.savefig("{2}/{1}/{0}_output.png".format(filename,outdir,cwd))
     plt.close()
     
-    fig,ax = plt.subplots()
-    ax.imshow(np.log10(ps_chunk[cx-100:cx+100,cy-100:cy+100]),cmap='Greys')       # print out the PS with the regions sampled                
-    ax.axis('off')
-    fig.savefig("{2}/{1}/{0}_PS.png".format(filename,outdir,cwd))
-    plt.close()
-    
-    fig,ax = plt.subplots()
-    mrcim = mrc_image(i)
-    image = read(mrcim)
-    ax.imshow(image,cmap='Greys') 
-    ax.axis('off')
-    fig.savefig("{2}/{1}/{0}_img.png".format(filename,outdir,cwd))
-    plt.close()
+    #fig,ax = plt.subplots()
+    #ax.imshow(np.log10(ps_chunk[cx-100:cx+100,cy-100:cy+100]),cmap='Greys')       # print out the PS with the regions sampled                
+    #ax.axis('off')
+    #fig.savefig("{2}/{1}/{0}_PS.png".format(filename,outdir,cwd))
+    #plt.close()
+    #
+    #fig,ax = plt.subplots()
+    #mrcim = mrc_image(i)
+    #image = read(mrcim)
+    #ax.imshow(image,cmap='Greys') 
+    #ax.axis('off')
+    #fig.savefig("{2}/{1}/{0}_img.png".format(filename,outdir,cwd))
+    #plt.close()
     
     runcount +=1
 print('--\n{0} predicted fibrils\n{1} predicted empty'.format(fibcount,emptycount))
